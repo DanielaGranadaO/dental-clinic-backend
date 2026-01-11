@@ -48,6 +48,9 @@ class UsuarioSistema
     #[ORM\Column(nullable: true)]
     private ?\DateTime $actualizado = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTime $ultimoIntentoFallido = null;
+
     public function __construct()
     {
         $this->creado = new \DateTime();
@@ -187,6 +190,18 @@ class UsuarioSistema
     public function setActualizado(?\DateTime $actualizado): static
     {
         $this->actualizado = $actualizado;
+
+        return $this;
+    }
+
+    public function getUltimoIntentoFallido(): ?\DateTime
+    {
+        return $this->ultimoIntentoFallido;
+    }
+
+    public function setUltimoIntentoFallido(?\DateTime $ultimoIntentoFallido): static
+    {
+        $this->ultimoIntentoFallido = $ultimoIntentoFallido;
 
         return $this;
     }

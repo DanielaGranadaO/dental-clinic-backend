@@ -8,36 +8,36 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @extends ServiceEntityRepository<UsuarioSistema>
- */
+*/
 class UsuarioSistemaRepository extends ServiceEntityRepository
 {
+
+    private $conn;
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, UsuarioSistema::class);
+        $this->conn = $registry->getConnection();
     }
 
-    //    /**
-    //     * @return UsuarioSistema[] Returns an array of UsuarioSistema objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('u.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findByUsername(string $username): array|false
+    {
+        return $this->conn->executeQuery(
+            "SELECT
+                id,
+                username,
+                password,
+                nombre,
+                email,
+                rol,
+                odontologo_id,
+                estado,
+                intento_fallido,
+                ultimo_intento_fallido,
+                ultimo_acceso
+                FROM usuario_sistema WHERE username = :username",
+            ['username' => $username]
+        )->fetchAssociative();
+    }
 
-    //    public function findOneBySomeField($value): ?UsuarioSistema
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }
