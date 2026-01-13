@@ -40,4 +40,58 @@ class UsuarioSistemaRepository extends ServiceEntityRepository
         )->fetchAssociative();
     }
 
+    public function resetFailedAttempts(int $userId): int
+    {
+        return $this->conn->executeStatement(
+            "UPDATE usuario_sistema 
+             SET intento_fallido = 0, ultimo_intento_fallido = NULL 
+             WHERE id = :id",
+            ['id' => $userId]
+        );
+    }
+
+    public function incrementFailedAttempts(int $userId): int
+    {
+        return $this->conn->executeStatement(
+            "UPDATE usuario_sistema 
+             SET intento_fallido = intento_fallido + 1, ultimo_intento_fallido = NOW() 
+             WHERE id = :id",
+            ['id' => $userId]
+        );
+    }
+
+    public function saveToken(string $token, string $expiracion, int $userId): bool
+    {
+        $rows = $this->conn->executeStatement(
+            "INSERT INTO user_tokens (user_id, token, expires_at) VALUES (:user_id, :token, :expires_at)",
+            [
+                'user_id' => $userId,
+                'token' => $token,
+                'expires_at' => $expiracion
+            ]
+        );
+
+        return $rows === 1;
+    }
+
+    public function findUserByToken(string $token): array|false
+    {
+        return $this->conn->executeQuery(
+            "SELECT us.id, us.username, us.nombre, us.email, us.rol
+             FROM usuario_sistema us
+             JOIN user_tokens ut ON us.id = ut.user_id
+             WHERE ut.token = :token AND ut.expires_at > NOW() LIMIT 1",
+            ['token' => $token]
+        )->fetchAssociative();
+    }
+
+    public function deleteToken(string $token) : bool {
+        $rows = $this->conn->executeStatement(
+            "DELETE FROM user_tokens WHERE token = :token",
+            ['token' => $token]
+        );
+
+        return $rows > 0;
+    }
+
 }
