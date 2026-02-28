@@ -22,7 +22,7 @@ final class AuthController extends AbstractController
     #[Route('/api/login', name: 'api_login', methods: ['POST'])]
     public function login (Request $request, AuthService $authService): JsonResponse{
        $data = json_decode($request->getContent(), true) ?? [];
-        
+
        $username = $data['username'] ?? '';
        $password = $data['password'] ?? '';
         return new JsonResponse(
